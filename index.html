@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>מדינה סטודיו</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;500;700;900&family=Heebo:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0d0d0d;--s1:#161616;--s2:#1e1e1e;--b1:#2a2a2a;--b2:#383838;--b3:#505050;--txt:#ede9e0;--muted:#777;--gold:#c8a24a;--gold-d:#6b5120;--gold-bg:rgba(200,162,74,.09);--teal:#28a98e;--teal-d:#14574a;--teal-bg:rgba(40,169,142,.09);--red:#e06b6b;--red-bg:rgba(224,107,107,.09);--peer:#4b9fe8;--osher:#38c48a;--benzur:#9d88e0;--eyal:#df7c52;--ravid:#e8a84b;--omer:#e85e8a}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--txt);font-family:'Heebo',sans-serif;font-size:15px;line-height:1.6;min-height:100vh}
+.hdr{display:flex;align-items:center;gap:12px;padding:14px 20px;border-bottom:1px solid var(--b1);background:var(--bg);position:sticky;top:0;z-index:10}
+.hdr-logo{width:34px;height:34px;background:var(--gold);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'Frank Ruhl Libre',serif;font-size:17px;font-weight:900;color:#0d0d0d;flex-shrink:0}
+.hdr-t{font-family:'Frank Ruhl Libre',serif;font-size:17px;font-weight:700}
+.hdr-s{font-size:11px;color:var(--muted)}
+.layout{display:grid;grid-template-columns:330px 1fr;min-height:calc(100vh - 63px)}
+.sidebar{border-left:1px solid var(--b1);padding:22px 18px;display:flex;flex-direction:column;gap:18px;overflow-y:auto;height:calc(100vh - 63px);position:sticky;top:63px}
+.sec-lbl{font-size:10px;font-weight:700;letter-spacing:.12em;color:var(--muted);text-transform:uppercase;margin-bottom:10px}
+.artist-list{display:flex;flex-direction:column;gap:7px}
+.ac{background:var(--s1);border:1px solid var(--b1);border-radius:10px;padding:10px 12px;transition:border-color .15s,background .15s}
+.ac.on{border-color:var(--b3);background:rgba(255,255,255,.02)}
+.ac-top{display:flex;align-items:center;gap:9px;margin-bottom:3px}
+.ac-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.ac-name{font-size:13px;font-weight:500;flex:1}
+.ac-pct{font-size:13px;font-weight:700;min-width:36px;text-align:left;font-variant-numeric:tabular-nums}
+.ac-sub{font-size:10px;color:var(--muted);margin-bottom:7px;line-height:1.3}
+input[type=range]{width:100%;height:4px;-webkit-appearance:none;appearance:none;background:var(--b2);border-radius:2px;outline:none;cursor:pointer;touch-action:pan-y}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--txt);border:2px solid var(--bg);cursor:pointer}
+input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:var(--txt);border:2px solid var(--bg);cursor:pointer;border-style:solid}
+.blend-bar{height:5px;border-radius:3px;overflow:hidden;display:flex;background:var(--b1)}
+.bs{height:100%;transition:width .25s}
+.theme-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.tb{background:var(--s1);border:1px solid var(--b1);border-radius:8px;padding:8px 8px;font-size:12px;font-family:'Heebo',sans-serif;color:var(--muted);cursor:pointer;text-align:center;width:100%;transition:all .12s;-webkit-tap-highlight-color:transparent}
+.tb:hover{border-color:var(--b2);color:var(--txt)}
+.tb.on{border-color:var(--gold-d);background:var(--gold-bg);color:var(--gold);font-weight:500}
+.gen-btn{width:100%;padding:13px;background:var(--gold);color:#0d0d0d;border:none;border-radius:10px;font-size:15px;font-weight:700;font-family:'Heebo',sans-serif;cursor:pointer;transition:opacity .15s;-webkit-tap-highlight-color:transparent}
+.gen-btn:hover{opacity:.88}
+.gen-btn:active{transform:scale(.98)}
+.gen-btn:disabled{opacity:.35;cursor:not-allowed}
+.main{padding:28px 32px;overflow-y:auto}
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:14px;text-align:center;color:var(--muted)}
+.empty-icon{width:60px;height:60px;border:1px solid var(--b2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;color:var(--b3)}
+.empty h3{font-family:'Frank Ruhl Libre',serif;font-size:20px;color:var(--b3);font-weight:500}
+.empty p{font-size:13px;max-width:280px;line-height:1.6}
+.load-bar{height:2px;background:var(--b1);border-radius:1px;overflow:hidden;margin-bottom:20px;display:none}
+.load-bar.on{display:block}
+.load-fill{height:100%;background:var(--gold);animation:la 1.8s ease-in-out infinite;width:35%}
+@keyframes la{0%{transform:translateX(350%)}100%{transform:translateX(-120%)}}
+.err-box{color:var(--red);font-size:13px;padding:12px 16px;background:var(--red-bg);border:1px solid rgba(224,107,107,.25);border-radius:8px;margin-bottom:16px;display:none}
+.err-box.on{display:block}
+.song-out{display:none}
+.song-out.on{display:block}
+.song-title{font-family:'Frank Ruhl Libre',serif;font-size:28px;font-weight:900;line-height:1.2;margin-bottom:10px}
+.pills{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.pill{font-size:11px;padding:3px 10px;border-radius:99px;border:1px solid;font-weight:500}
+.pg{border-color:var(--gold-d);color:var(--gold);background:var(--gold-bg)}
+.pt{border-color:var(--teal-d);color:var(--teal);background:var(--teal-bg)}
+.pm{border-color:var(--b2);color:var(--muted)}
+.blend-note{font-size:13px;color:var(--muted);font-style:italic;margin-bottom:22px}
+.song-body{display:flex;flex-direction:column;gap:10px;margin-bottom:24px}
+.ss{background:var(--s1);border:1px solid var(--b1);border-radius:12px;padding:16px 20px}
+.ss.chorus{border-color:var(--gold-d);background:var(--gold-bg)}
+.ss.chorus2{border-color:rgba(200,162,74,.3);background:rgba(200,162,74,.04)}
+.ss-lbl{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.ss.chorus .ss-lbl,.ss.chorus2 .ss-lbl{color:var(--gold)}
+.ss-txt{font-family:'Frank Ruhl Libre',serif;font-size:17px;line-height:2.2;color:var(--txt);white-space:pre-wrap;direction:rtl}
+.ss.chorus .ss-txt{font-size:19px;font-weight:700}
+.ss.chorus2 .ss-txt{font-size:19px;font-weight:700}
+.suno-panel{border:1px solid var(--teal-d);background:var(--teal-bg);border-radius:12px;padding:20px;margin-bottom:24px}
+.suno-hdr{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.suno-logo{width:28px;height:28px;background:var(--teal);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:#0d0d0d;flex-shrink:0}
+.suno-tt{font-size:14px;font-weight:700;color:var(--teal)}
+.suno-st{font-size:11px;color:var(--muted)}
+.suno-fields{display:flex;flex-direction:column;gap:12px}
+.sf-lbl{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px}
+.sf-wrap{position:relative}
+.sf-txt{background:var(--s2);border:1px solid var(--b2);border-radius:8px;padding:11px 14px 11px 52px;font-size:13px;color:var(--txt);line-height:1.7;white-space:pre-wrap;word-break:break-word;direction:ltr;font-family:monospace}
+.sf-txt.heb{direction:rtl;font-family:'Frank Ruhl Libre',serif;font-size:15px;max-height:300px;overflow-y:auto}
+.cp-btn{position:absolute;bottom:8px;left:8px;background:var(--s1);border:1px solid var(--b2);border-radius:6px;color:var(--muted);font-size:11px;padding:4px 10px;cursor:pointer;font-family:'Heebo',sans-serif;transition:all .12s;white-space:nowrap}
+.cp-btn:hover{color:var(--txt);border-color:var(--b3)}
+.cp-btn.ok{color:var(--teal);border-color:var(--teal-d)}
+@media(max-width:720px){
+  .layout{grid-template-columns:1fr}
+  .sidebar{border-left:none;border-bottom:1px solid var(--b1);height:auto;position:static}
+  .main{padding:16px}
+  .song-title{font-size:22px}
+  .ss-txt{font-size:15px}
+  .ss.chorus .ss-txt,.ss.chorus2 .ss-txt{font-size:17px}
+  .sf-txt{padding-left:14px;padding-bottom:36px}
+}
+</style>
+</head>
+<body>
+<div class="hdr">
+  <div class="hdr-logo">מ</div>
+  <div><div class="hdr-t">מדינה סטודיו</div><div class="hdr-s">יצירת שירים + ייצוא ל-Suno</div></div>
+</div>
+<div class="layout">
+  <aside class="sidebar">
+    <div>
+      <div class="sec-lbl">מיקסר סגנונות</div>
+      <div class="artist-list">
+        <div class="ac on" id="card-peer"><div class="ac-top"><div class="ac-dot" style="background:var(--peer)"></div><span class="ac-name">פאר טסי</span><span class="ac-pct" id="pct-peer">33%</span></div><div class="ac-sub">מזרחי רגשי · בלדות · "אהבה חולה", "חורף בחלון", "38"</div><input type="range" min="0" max="100" step="5" value="33" id="sl-peer"></div>
+        <div class="ac on" id="card-osher"><div class="ac-top"><div class="ac-dot" style="background:var(--osher)"></div><span class="ac-name">אושר כהן</span><span class="ac-pct" id="pct-osher">34%</span></div><div class="ac-sub">פופ מזרחי קליט · "מנגן ושר", "פלסטרים", "אהבה"</div><input type="range" min="0" max="100" step="5" value="34" id="sl-osher"></div>
+        <div class="ac on" id="card-eyal"><div class="ac-top"><div class="ac-dot" style="background:var(--eyal)"></div><span class="ac-name">אייל גולן</span><span class="ac-pct" id="pct-eyal">33%</span></div><div class="ac-sub">מדינה קלאסי · "צליל מיתר", "ממה את מפחדת"</div><input type="range" min="0" max="100" step="5" value="33" id="sl-eyal"></div>
+        <div class="ac" id="card-benzur"><div class="ac-top"><div class="ac-dot" style="background:var(--benzur)"></div><span class="ac-name">בן צור</span><span class="ac-pct" id="pct-benzur">0%</span></div><div class="ac-sub">פופ אמוני · "אבא", "טאטע תטהר", "כל עכבה לטובה"</div><input type="range" min="0" max="100" step="5" value="0" id="sl-benzur"></div>
+        <div class="ac" id="card-omer"><div class="ac-top"><div class="ac-dot" style="background:var(--omer)"></div><span class="ac-name">עומר אדם</span><span class="ac-pct" id="pct-omer">0%</span></div><div class="ac-sub">פופ מזרחי מודרני · "כחול לבן", "חברות שלך", "ספיישל"</div><input type="range" min="0" max="100" step="5" value="0" id="sl-omer"></div>
+        <div class="ac" id="card-ravid"><div class="ac-top"><div class="ac-dot" style="background:var(--ravid)"></div><span class="ac-name">רביד פלוטניק</span><span class="ac-pct" id="pct-ravid">0%</span></div><div class="ac-sub">היפ הופ / פופ · "כפרה שלי", "בדיוק כמו שאני"</div><input type="range" min="0" max="100" step="5" value="0" id="sl-ravid"></div>
+      </div>
+      <div class="blend-bar" style="margin-top:12px">
+        <div class="bs" id="bs-peer" style="background:var(--peer);width:33%"></div>
+        <div class="bs" id="bs-osher" style="background:var(--osher);width:34%"></div>
+        <div class="bs" id="bs-eyal" style="background:var(--eyal);width:33%"></div>
+        <div class="bs" id="bs-benzur" style="background:var(--benzur);width:0%"></div>
+        <div class="bs" id="bs-omer" style="background:var(--omer);width:0%"></div>
+        <div class="bs" id="bs-ravid" style="background:var(--ravid);width:0%"></div>
+      </div>
+    </div>
+    <div>
+      <div class="sec-lbl">נושא השיר</div>
+      <div class="theme-grid">
+        <button class="tb on" id="tb-love"       onclick="pickT('love',this)">אהבה</button>
+        <button class="tb"    id="tb-heartbreak" onclick="pickT('heartbreak',this)">כאב פרידה</button>
+        <button class="tb"    id="tb-longing"    onclick="pickT('longing',this)">געגוע</button>
+        <button class="tb"    id="tb-hope"       onclick="pickT('hope',this)">תקווה</button>
+        <button class="tb"    id="tb-night"      onclick="pickT('night',this)">לילה בודד</button>
+        <button class="tb"    id="tb-country"    onclick="pickT('country',this)">אהבת מולדת</button>
+      </div>
+    </div>
+    <button class="gen-btn" id="genBtn" onclick="generate()">✦ צור שיר להיט</button>
+  </aside>
+  <main class="main">
+    <div class="empty" id="emptyState">
+      <div class="empty-icon">♪</div>
+      <h3>הסטודיו מוכן</h3>
+      <p>בחר סגנונות ונושא, לחץ "צור שיר להיט" — תקבל שיר מלא מוכן ל-Suno.</p>
+    </div>
+    <div class="load-bar" id="loadBar"><div class="load-fill"></div></div>
+    <div class="err-box" id="errEl"></div>
+    <div class="song-out" id="songOut">
+      <div class="song-title" id="songTitle"></div>
+      <div class="pills" id="songPills"></div>
+      <div class="blend-note" id="blendNote"></div>
+      <div class="song-body" id="songBody"></div>
+      <div class="suno-panel">
+        <div class="suno-hdr">
+          <div class="suno-logo">S</div>
+          <div><div class="suno-tt">ייצוא ל-Suno AI</div><div class="suno-st">Custom Mode ← העתק כל שדה</div></div>
+        </div>
+        <div class="suno-fields">
+          <div><span class="sf-lbl">Style of Music</span><div class="sf-wrap"><div class="sf-txt" id="sfStyle"></div><button class="cp-btn" onclick="cp('sfStyle',this)">העתק</button></div></div>
+          <div><span class="sf-lbl">Title</span><div class="sf-wrap"><div class="sf-txt heb" id="sfTitle"></div><button class="cp-btn" onclick="cp('sfTitle',this)">העתק</button></div></div>
+          <div><span class="sf-lbl">Lyrics</span><div class="sf-wrap"><div class="sf-txt heb" id="sfLyrics"></div><button class="cp-btn" onclick="cp('sfLyrics',this)">העתק</button></div></div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+var raw={peer:33,osher:34,eyal:33,benzur:0,omer:0,ravid:0};
+var KEYS=['peer','osher','eyal','benzur','omer','ravid'];
+var theme='love';
+
+// ============================================================
+// DNA מעמיק לכל זמר — מבוסס על ניתוח השירים האמיתיים שלהם
+// ============================================================
+var A={
+  peer:{
+    name:'פאר טסי',
+    color:'var(--peer)',
+    suno:'Mizrahi Israeli pop ballad, raw emotional male tenor vocals, oud melody, darbuka percussion, minor maqam scale, melancholic strings, 78-88 BPM',
+    // DNA אמיתי מ"אהבה חולה", "חורף בחלון", "38", "שלוש בלילה", "בחור פשוט", "דרך השלום"
+    dna:[
+      'שורות קצרות ומדויקות — 6-9 מילים, כל מילה שקולה',
+      'חזרת ביטוי מרכזי פעמיים-שלוש — זה הלב של השיר',
+      'דיבור ישיר לאהובה בגוף שני: "את", "שלך", "ליך", "אותך"',
+      'דימויים: לילה, חלון גשום, חדר ריק, אור מהרחוב, קור, שעות קטנות',
+      'שפה יומיומית מדוברת — לא מליצית, כמו שמדברים בחיים',
+      'רגשות עצמתיים דרך פרטים קטנים, לא דרך הצהרות גדולות',
+      'פזמון: שורה מרכזית אחת (4-5 מילים) שחוזרת שוב ושוב',
+      'חרוזי סיום: -ייך/-יך, -אתי/-ייתי, -לה/-יה, -ים/-יים'
+    ],
+    // דוגמאות מהשירים האמיתיים (מנוסחות מחדש כדי ללמד מהסגנון)
+    style_ex:'בסגנון "אהבה חולה": רגש עז דרך מילים פשוטות. "חורף בחלון": בדידות ולילה. "38": חזרות על ביטוי יחיד שגדל ומגדל. "שלוש בלילה": שעות קטנות ומחשבות שלא נעצרות.'
+  },
+  osher:{
+    name:'אושר כהן',
+    color:'var(--osher)',
+    suno:'Israeli Mizrahi pop, warm smooth male vocals, catchy melodic hook, oud and electric guitar, Mediterranean groove, upbeat emotional, 88-100 BPM',
+    // DNA מ"פלסטרים", "מנגן ושר", "אהבה" (שיר השנה), "ככה וככה", "אין אותי"
+    dna:[
+      'שורות בינוניות-ארוכות — 9-13 מילים, מלודיות ומתנגנות',
+      'משחק מילים: מילה שאפשר לקרוא בשני מובנים — פשוטי ורגשי',
+      'פזמון קליט שנשאר בראש — שורת HooK קצרה שחוזרת',
+      'שמחה גם בכאב — "ככה וככה", חיוך עצוב',
+      'ביטויים מהיומיום שמקבלים עומק: "פלסטרים", "מנגן ושר"',
+      'הומור עדין ואירוניה של החיים',
+      'חרוזים פנימיים — לא רק בסיום שורה אלא בתוכה',
+      'חרוזי סיום: -ור/-ור, -שיר/-ביר, -עד/-חד, -ים/-חיים'
+    ],
+    style_ex:'בסגנון "פלסטרים": מטפורה יומיומית לכאב עמוק. "מנגן ושר": אמנות כמפלט. "אהבה": פשטות שהופכת לגדולה. "אין אותי": היעדרות שנוכחת.'
+  },
+  eyal:{
+    name:'אייל גולן',
+    color:'var(--eyal)',
+    suno:'Classic Israeli Medina pop, powerful passionate male vocals, full arrangement with brass and strings, darbuka and drums, romantic anthemic energy, 90-108 BPM',
+    // DNA מ"צליל מיתר", "ממה את מפחדת", "יפה לך להיות מאושרת", "מי שמאמין", "בלונים"
+    dna:[
+      'שורות ארוכות ואנרגטיות — 11-15 מילים, גל שעולה ויורד',
+      'פניה ישירה ולהוטה לאישה: "את יפה שלי", "בואי אלי", "תני לי"',
+      'אנרגיה שעולה לקראת הפזמון — build-up מובנה',
+      'פזמון אנתמי: כולם שרים ביחד, שורות עוצמתיות ופשוטות',
+      'גוזמה רומנטית יפה: "מיליון כוכבים", "כל העולם"',
+      'חיזור ישיר, לא מצנן: ישירות כמחמאה',
+      'מנגינה שעולה בקפיצות — הטקסט מרגיש כמו עלייה',
+      'חרוזי סיום: -לי/-שלי, -ייך/-ביך, -אה/-יה, -עת/-לת'
+    ],
+    style_ex:'בסגנון "צליל מיתר": שיר האהבה שמגדיר ז\'אנר. "ממה את מפחדת": חיזור עדין ועוצמתי. "יפה לך": שבח ישיר. "מי שמאמין": אמונה כרגש.'
+  },
+  benzur:{
+    name:'בן צור',
+    color:'var(--benzur)',
+    suno:'Israeli faith pop, sincere introspective male vocals, acoustic guitar and piano, soft production, spiritual personal lyrics, 70-82 BPM',
+    // DNA מ"אבא", "טאטע תטהר", "כל עכבה לטובה", "סיפורי צדיקים"
+    dna:[
+      'כנות מוחלטת — כמו דיאלוג פנימי שנחשף',
+      'שאלות ישירות לאלוהים, לעצמו, לאהוב',
+      'מילים מהתפילה והתנ"ך בהקשר חדש ומודרני',
+      'שורות קצרות ועמוקות — 6-10 מילים עם משקל',
+      'פזמון שמרפא — שורות שרוצים להגיד לעצמך',
+      'חיפוש עצמי ורוחני שלא מתיימר לדעת תשובות',
+      'אהבה ואמונה כדבר אחד',
+      'חרוזי סיום: -ה/-ה (נקבה), -ים/-חיים, -אל/-קל'
+    ],
+    style_ex:'בסגנון "אבא": שיחה ישירה עם הבורא. "כל עכבה לטובה": אמונה בתוך קושי. "טאטע תטהר": יידיש מודרני, חיפוש שורשים.'
+  },
+  omer:{
+    name:'עומר אדם',
+    color:'var(--omer)',
+    suno:'Modern Israeli Mizrahi pop, unique high-range male vocals with emotional swoops, electronic production, Mediterranean groove, energetic and emotional, 94-110 BPM',
+    // DNA מ"כחול לבן", "חברות שלך", "ספיישל", "טביעת אצבע", "לא מוותר"
+    dna:[
+      'שורות בינוניות קצביות — 8-12 מילים, מוכוונות ריתמוס',
+      'קול גבוה ייחודי — מילים שמדגישות כיסוי קולי רחב',
+      'אלקטרוניקה ומזרחיות — שפה מודרנית עם לב ים-תיכוני',
+      'פזמון חזק וחוזר — שורה קצרה שמרקיעה שחקים',
+      'שיתופי פעולה — שיר שמרגיש כמו שיחה עם עוד קול',
+      'עולם הרחוב והיומיום: "ספיישל", "חברות שלך"',
+      'ניגוד בין כוח לפגיעות — חזק בחוץ, שבור בפנים',
+      'חרוזי סיום: -ר/-ר, -ות/-ות, -אל/-יאל, -יב/-טיב'
+    ],
+    style_ex:'בסגנון "כחול לבן": גאווה ישראלית בעיבוד מודרני. "חברות שלך": חיזור בשפת הרחוב. "ספיישל": מיוחדות הרגע. "טביעת אצבע": זהות.'
+  },
+  ravid:{
+    name:'רביד פלוטניק',
+    color:'var(--ravid)',
+    suno:'Israeli hip-hop pop crossover, raw authentic male vocals, lyrical storytelling, piano and bass, emotional narrative flow, 80-96 BPM',
+    // DNA מ"כפרה שלי", "בדיוק כמו שאני", "קפה וסיגריה", "כל הזמן הזה", "שמש שזורחת"
+    dna:[
+      'סיפור אמיתי — כל שיר הוא נרטיב עם התחלה אמצע וסוף',
+      'פרטים ביוגרפיים קונקרטיים — שמות, מקומות, זיכרונות',
+      'שפה ישירה ולא מתחכמת — כמו שמדברים ברחוב',
+      'שורות ארוכות ורהוטות — 12-16 מילים, flow טבעי',
+      'הומור ועצב ביחד — צחוק עם דמעה',
+      'שכבות משמעות — פשוט על פני השטח, עמוק מתחת',
+      'פזמון מלודי אחרי בתים רהוטים — ניגוד שמחזק',
+      'חרוזי סיום: -ים/-חיים, -ון/-טון, -יה/-ביה, -אם/-שם'
+    ],
+    style_ex:'בסגנון "כפרה שלי": אהבה כנה בלי מתיקות יתר. "בדיוק כמו שאני": קבלה עצמית. "קפה וסיגריה": רגע יומיומי שהופך לשיר. "כל הזמן הזה": ניצול זמן.'
+  }
+};
+
+var T={
+  love:{
+    name:'אהבה',
+    suno:'overwhelming romantic love, hopeful warm emotion, heart full',
+    desc:'אהבה שמציפה הכל ומשנה כל רגע. התמקד בפרטים קטנים: איך היא מחייכת, הקול שלה, הרגע הראשון. לא "אני אוהב אותך" — אלא "כשאת נוגעת בכוס הקפה שלך הלב שלי עוצר".'
+  },
+  heartbreak:{
+    name:'כאב פרידה',
+    suno:'heartbreak raw pain separation, melancholic emotional',
+    desc:'הכאב שאחרי. לא הפרידה עצמה אלא מה שנשאר: הכיסא שלה, הצד שלה במיטה, ריח הבושם שנשאר על הכרית. הגוף זוכר מה שהראש מנסה לשכוח.'
+  },
+  longing:{
+    name:'געגוע',
+    suno:'deep yearning longing for someone far away, bittersweet',
+    desc:'המרחק שמכאיב כל רגע. לא עצב — כמיהה. הרצון הפיזי לגעת, לשמוע את הקול. המרחק בקילומטרים שמרגיש כמו שנים.'
+  },
+  hope:{
+    name:'תקווה',
+    suno:'hope rising after darkness, uplifting emotional journey',
+    desc:'לא אופטימיות זולה — אמונה שנולדת מקושי. אחרי שהכל קרס, עדיין קמים. שמש שעולה לא כי הלילה נגמר אלא כי בוחרים לראות אותה.'
+  },
+  night:{
+    name:'לילה בודד',
+    suno:'late night loneliness introspective quiet pain',
+    desc:'שעות קטנות שבהן כל מה שדחית ביום עולה. לא עצבות כללית — ה-3:00 הספציפי, הסיכולים הספציפיים, המחשבות שרצות בדיוק אז.'
+  },
+  country:{
+    name:'אהבת מולדת',
+    suno:'Israeli patriotic love for the land, proud emotional heartfelt',
+    desc:'אהבה לארץ שלא מגיעה מדגל — מגיעה מריח האדמה, מהכרמל בשקיעה, מהשוק ביום שישי, מאנשים שנפגשים. הקשר שמקשה על עזיבה.'
+  }
+};
+
+// מבני שיר — בית=2 חלקים, עם אפשרות לבית שלישי
+var STRUCTS=[
+  {segs:['v1a','v1b','ch','v2a','v2b','ch'],has3:false},
+  {segs:['v1a','v1b','ch','v2a','v2b','ch','v3a','v3b','ch'],has3:true},
+  {segs:['v1a','v1b','ch','v2a','v2b','ch','ch'],has3:false}
+];
+
+// פתיחות שונות לגיוון
+var OPENS=[
+  'פתח בתמונה ויזואלית מיידית — חפץ, מקום, שעה ספציפית',
+  'פתח בפעולה — משהו שקורה ברגע זה, לא תיאור',
+  'פתח בשאלה ישירה לאהובה',
+  'פתח בניגוד חד: "כולם..." מול "ואני..."',
+  'פתח בפרט קטן שנושא משמעות גדולה'
+];
+var RHYMESETS=[
+  ['לב / קרב / חרב', 'ליל / קיל / כיל', 'עין / ריין / מין'],
+  ['שמים / ימים / חיים', 'לבד / עוד / סוד', 'חלום / שלום / עולם'],
+  ['אלייך / שלייך / ביייך', 'עיינייך / חלייך / קולייך', 'ידייך / דרכייך / עולמייך'],
+  ['לילה / עלייה / יחידה', 'שורה / תורה / אורה', 'ממני / מהכי / עלי']
+];
+
+function getNorm(){
+  var tot=0;KEYS.forEach(function(k){tot+=raw[k]});
+  if(!tot)return null;
+  var n={},s=0;
+  KEYS.forEach(function(k){n[k]=Math.round(raw[k]/tot*100);s+=n[k]});
+  if(s!==100){var b=KEYS[0];KEYS.forEach(function(k){if(n[k]>n[b])b=k});n[b]+=(100-s)}
+  return n;
+}
+function renderSliders(){
+  var n=getNorm();
+  KEYS.forEach(function(id){
+    document.getElementById('pct-'+id).textContent=(n?n[id]:0)+'%';
+    document.getElementById('card-'+id).className='ac'+(raw[id]>0?' on':'');
+    document.getElementById('bs-'+id).style.width=(n?n[id]:0)+'%';
+  });
+}
+KEYS.forEach(function(id){
+  document.getElementById('sl-'+id).oninput=function(){raw[id]=+this.value;renderSliders()};
+});
+function pickT(id,el){theme=id;document.querySelectorAll('.tb').forEach(function(b){b.className='tb'});el.className='tb on'}
+function cp(id,btn){
+  var txt=document.getElementById(id).innerText||'';
+  function done(){btn.textContent='✓ הועתק';btn.classList.add('ok');setTimeout(function(){btn.textContent='העתק';btn.classList.remove('ok')},2000)}
+  if(navigator.clipboard){navigator.clipboard.writeText(txt).then(done).catch(function(){fb(txt);done()})}else{fb(txt);done()}
+}
+function fb(t){var x=document.createElement('textarea');x.value=t;x.style.cssText='position:fixed;opacity:0';document.body.appendChild(x);x.select();try{document.execCommand('copy')}catch(e){}document.body.removeChild(x)}
+
+function buildStyle(norm,active){
+  var dom=active.reduce(function(a,b){return norm[a]>norm[b]?a:b});
+  var parts=[A[dom].suno];
+  var others=active.filter(function(id){return id!==dom&&norm[id]>=15});
+  if(others.length)parts.push('blended with '+others.map(function(id){return A[id].suno.split(',')[0]}).join(' and '));
+  parts.push('theme: '+T[theme].suno);
+  parts.push('Hebrew lyrics, Israeli radio quality, no rap flow, passionate emotional delivery');
+  return parts.join(', ');
+}
+function buildLyrics(s,struct){
+  var lines=[];
+  lines.push('[Intro]');lines.push('');
+  var chIdx=0;
+  struct.segs.forEach(function(seg){
+    if(seg==='v1a'){lines.push('[Verse 1]');lines.push(s.v1a||'');lines.push('');}
+    else if(seg==='v1b'){lines.push('[Verse 1 - Part B]');lines.push(s.v1b||'');lines.push('');}
+    else if(seg==='v2a'){lines.push('[Verse 2]');lines.push(s.v2a||'');lines.push('');}
+    else if(seg==='v2b'){lines.push('[Verse 2 - Part B]');lines.push(s.v2b||'');lines.push('');}
+    else if(seg==='v3a'){lines.push('[Verse 3]');lines.push(s.v3a||'');lines.push('');}
+    else if(seg==='v3b'){lines.push('[Verse 3 - Part B]');lines.push(s.v3b||'');lines.push('');}
+    else if(seg==='ch'){
+      chIdx++;
+      var tag=chIdx===1?'[Chorus]':(chIdx===struct.segs.filter(function(x){return x==='ch'}).length?'[Chorus: powerful]':'[Chorus]');
+      lines.push(tag);lines.push(s.ch||'');lines.push('');
+    }
+  });
+  return lines.join('\n').trim();
+}
+
+function renderSong(s,struct,norm,active,th){
+  document.getElementById('songTitle').textContent=s.title||'';
+  var ph=active.map(function(id){return '<span class="pill pg">'+A[id].name+' '+norm[id]+'%</span>'}).join('');
+  ph+='<span class="pill pt">'+th.name+'</span>';
+  document.getElementById('songPills').innerHTML=ph;
+  document.getElementById('blendNote').textContent=s.blend_note||'';
+  var html='',chCount=0;
+  var verseTitles={v1a:'בֵּית א׳ — א׳',v1b:'בֵּית א׳ — ב׳',v2a:'בֵּית ב׳ — א׳',v2b:'בֵּית ב׳ — ב׳',v3a:'בֵּית ג׳ — א׳',v3b:'בֵּית ג׳ — ב׳'};
+  struct.segs.forEach(function(seg){
+    if(seg==='ch'){
+      chCount++;
+      var cls=chCount===1?'ss chorus':'ss chorus2';
+      var lbl=chCount===1?'✦ פַּזְמוֹן':'✦ פַּזְמוֹן';
+      html+='<div class="'+cls+'"><div class="ss-lbl">'+lbl+'</div><div class="ss-txt">'+(s.ch||'')+'</div></div>';
+    } else {
+      html+='<div class="ss"><div class="ss-lbl">'+(verseTitles[seg]||seg)+'</div><div class="ss-txt">'+(s[seg]||'')+'</div></div>';
+    }
+  });
+  document.getElementById('songBody').innerHTML=html;
+  document.getElementById('sfStyle').textContent=buildStyle(norm,active);
+  document.getElementById('sfTitle').textContent=(s.title||'').replace(/[\u05B0-\u05C7]/g,'').trim();
+  document.getElementById('sfLyrics').textContent=buildLyrics(s,struct);
+}
+
+function generate(){
+  var norm=getNorm();if(!norm)return;
+  var btn=document.getElementById('genBtn');
+  btn.disabled=true;btn.textContent='כותב...';
+  document.getElementById('emptyState').style.display='none';
+  document.getElementById('songOut').className='song-out';
+  document.getElementById('loadBar').className='load-bar on';
+  document.getElementById('errEl').className='err-box';
+
+  var active=KEYS.filter(function(id){return norm[id]>0});
+  var th=T[theme];
+  var dom=active.reduce(function(a,b){return norm[a]>norm[b]?a:b});
+  var struct=STRUCTS[Math.floor(Math.random()*STRUCTS.length)];
+  var openHint=OPENS[Math.floor(Math.random()*OPENS.length)];
+  var rhymeSet=RHYMESETS[Math.floor(Math.random()*RHYMESETS.length)];
+
+  // ---- בניית הפרומפט המעמיק ----
+  var p='';
+  p+='אתה המשורר הישראלי המוכשר ביותר לשירי מדינה ופופ. אתה יודע בעל פה את כל השירים של פאר טסי, אושר כהן, אייל גולן, בן צור, עומר אדם ורביד פלוטניק.\n\n';
+  p+='=== משימה ===\n';
+  p+='כתוב שיר מדינה/פופ ישראלי ברמת להיט אמיתי שמשלב את הסגנונות הבאים:\n\n';
+
+  active.forEach(function(id){
+    p+=norm[id]+'% '+A[id].name+'\n';
+    p+='DNA של '+A[id].name+':\n';
+    A[id].dna.forEach(function(d){p+='  • '+d+'\n'});
+    p+='  '+A[id].style_ex+'\n\n';
+  });
+
+  p+='=== נושא: '+th.name+' ===\n';
+  p+=th.desc+'\n\n';
+
+  p+='=== כללי כתיבה — חייב לקיים את כולם ===\n\n';
+
+  p+='1. עברית אמיתית ונשמעת:\n';
+  p+='   כתוב איך שישראלים מדברים ושרים — לא איך שכותבים במילון.\n';
+  p+='   "בלעדייך" ולא "בלעדיך". "שלייך" ולא "שלך" (כשמתאים לחרוז).\n';
+  p+='   "ממני" נשמע "מימני". "אלייך" נשמע "אלייך".\n\n';
+
+  p+='2. חרוזים לפי הגייה — לא לפי כתיב:\n';
+  p+='   חרוז = אותו צליל כשמדברים בקול רם.\n';
+  p+='   טוב: "לב / קרב" ✓ | "ליל / קיל" ✓ | "ביי / שלי" ✗ (לא נשמע דומה)\n';
+  p+='   אפשרויות חרוז לשיר הזה: '+rhymeSet.join(' | ')+'\n';
+  p+='   אל תכריח חרוז שמאלץ מילה לא טבעית. טוב שלא לחרוז מאשר לשים מילה מאולצת.\n\n';
+
+  p+='3. שורות:\n';
+  p+='   כל שורה = 7-13 מילים. לא פחות, לא יותר.\n';
+  p+='   כמות ההברות בשורות מקבילות חייבת להיות דומה (±2 הברות).\n';
+  p+='   הרגישות המלודית: קרא בקול — האם נשמע כמו שיר?\n\n';
+
+  p+='4. פזמון (חובה!):\n';
+  p+='   שורה אחת מרכזית — HooK — שחוזרת לפחות 2 פעמים בפזמון.\n';
+  p+='   4-7 מילים בHooK. פשוטה, חזקה, לא נשכחת.\n';
+  p+='   מבנה הפזמון: [שורה א] [שורה ב] [HooK] [שורה ג] [HooK]\n\n';
+
+  p+='5. תוכן עם משמעות:\n';
+  p+='   כל שורה אומרת משהו — לא ממלאת מקום.\n';
+  p+='   דימויים קונקרטיים בלבד: "הכוס שלה עדיין על השולחן" לא "אני מרגיש עצוב".\n';
+  p+='   כל בית מתקדם בסיפור.\n\n';
+
+  p+='6. פתיחה: '+openHint+'\n\n';
+
+  p+='=== מבנה השיר ===\n';
+  p+='כל בית מחולק ל-2 חלקים (א ו-ב) של 4-5 שורות כל אחד.\n';
+  p+=struct.has3?'מבנה: בית א(א+ב) → פזמון → בית ב(א+ב) → פזמון → בית ג(א+ב) → פזמון\n':'מבנה: בית א(א+ב) → פזמון → בית ב(א+ב) → פזמון'+(struct.segs[struct.segs.length-1]==='ch'&&struct.segs[struct.segs.length-2]==='ch'?' → פזמון':'')+'\n';
+  p+='\n';
+
+  var fields='title,ch,v1a,v1b,v2a,v2b';
+  if(struct.has3) fields+=',v3a,v3b';
+
+  p+='=== פורמט ===\n';
+  p+='JSON בלבד, ללא שום טקסט לפני { או אחרי }:\n';
+  var schema={
+    title:'שם השיר (2-4 מילים, בלי ניקוד)',
+    blend_note:'משפט אחד — תיאור הסגנון המשולב',
+    ch:'שורה א\\nשורה ב\\nHooK\\nשורה ג\\nHooK',
+    v1a:'שורה1\\nשורה2\\nשורה3\\nשורה4',
+    v1b:'שורה1\\nשורה2\\nשורה3\\nשורה4',
+    v2a:'שורה1\\nשורה2\\nשורה3\\nשורה4',
+    v2b:'שורה1\\nשורה2\\nשורה3\\nשורה4'
+  };
+  if(struct.has3){schema.v3a='שורה1\\nשורה2\\nשורה3\\nשורה4';schema.v3b='שורה1\\nשורה2\\nשורה3\\nשורה4';}
+  p+=JSON.stringify(schema);
+
+  fetch('/api/generate',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:2200,messages:[{role:'user',content:p}]})
+  })
+  .then(function(r){return r.json()})
+  .then(function(data){
+    if(data.error) throw new Error(data.error.message||JSON.stringify(data.error));
+    var txt=data.content.map(function(i){return i.text||''}).join('');
+    var m=txt.match(/\{[\s\S]*\}/);
+    if(!m) throw new Error('תשובה לא תקינה מהשרת');
+    var s=JSON.parse(m[0]);
+    renderSong(s,struct,norm,active,th);
+    document.getElementById('loadBar').className='load-bar';
+    document.getElementById('songOut').className='song-out on';
+  })
+  .catch(function(e){
+    document.getElementById('loadBar').className='load-bar';
+    var er=document.getElementById('errEl');
+    er.textContent='שגיאה: '+e.message;
+    er.className='err-box on';
+    document.getElementById('emptyState').style.display='';
+  })
+  .finally(function(){btn.disabled=false;btn.textContent='✦ צור שיר להיט'});
+}
+renderSliders();
+</script>
+</body>
+</html>
